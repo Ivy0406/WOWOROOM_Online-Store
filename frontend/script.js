@@ -4,6 +4,7 @@ let allProducts = [];
 
 const dom = {
   productsList: document.querySelector(".productWrap"),
+  productSelect: document.querySelector(".productSelect"),
   cart: document.querySelector(".shoppingCart"),
   orderInfo: document.querySelector(".orderInfo"),
 };
@@ -13,7 +14,7 @@ getAllProducts();
 async function getAllProducts() {
   try {
     let response = await axios.get(AllProducts_Api_Url);
-    let allProducts = response.data.products;
+    allProducts = response.data.products;
     console.log(allProducts);
     renderProducts(allProducts);
   } catch (error) {
@@ -40,3 +41,19 @@ function renderProducts(products) {
     .join("");
   dom.productsList.innerHTML = combinedCards;
 }
+
+function filterProducts(categorySelected) {
+  if (categorySelected === "全部") {
+    renderProducts(allProducts);
+  } else {
+    let productsSelected = allProducts.filter(
+      (product) => product["category"] === categorySelected
+    );
+    renderProducts(productsSelected);
+  }
+}
+
+dom.productSelect.addEventListener("change", function (e) {
+  let categorySelected = e.target.value;
+  filterProducts(categorySelected);
+});
