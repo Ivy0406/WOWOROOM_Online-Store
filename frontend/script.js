@@ -20,3 +20,23 @@ async function getAllProducts() {
     console.log(error);
   }
 }
+
+function renderProducts(products) {
+  let combinedCards = products
+    .map((product) => {
+      let card = `<li class="productCard">
+          <h4 class="productType">${product["category"]}</h4>
+          <img
+            src=${product["images"]}
+            alt=${product["title"]}
+          />
+          <a href="#" class="addCardBtn">加入購物車</a>
+          <h3>${product["title"]}</h3>
+          <del class="originPrice">NT$${product["origin_price"]}</del>
+          <p class="nowPrice">NT$${product["price"]}</p>
+        </li>`;
+      return card;
+    })
+    .join("");
+  dom.productsList.innerHTML = combinedCards;
+}
