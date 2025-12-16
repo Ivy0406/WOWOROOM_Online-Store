@@ -57,7 +57,6 @@ async function getProductsInCart() {
     productsInCart = response.data.carts;
     cartTotalPrice = response.data.finalTotal;
     renderCart(productsInCart);
-    console.log(productsInCart);
   } catch (error) {
     console.log(error);
   }
@@ -86,15 +85,8 @@ function renderProducts(products) {
     dom.addCardBtns.forEach((btn) => {
     btn.addEventListener("click", function (e) {
         e.preventDefault();
-        let productTraget = e.target.closest(".productCard");
-        console.log(productTraget);
-        const prodoctToCart = {
-            data: {
-            productId: productTraget.dataset.id,
-            quantity: getQuantity(id)
-            }
-        }
-        console.log(prodoctToCart);
+        let targetId = e.target.closest(".productCard").dataset.id;
+        addCart(targetId);
     });
 });
 }
@@ -110,17 +102,23 @@ function filterProducts(categorySelected) {
   }
 }
 
-function getQuantity(id) {
+function getQuantity(targetId) {
+    let existItemsInCart = productsInCart.find(item=>item.product.id === targetId);
+    let quantity = existItemsInCart ? Number(existItemsInCart.quantity) +1 :1;
+    return quantity;
 }
 
 function renderCart(productsInCart){
-    let cartItems = productsInCart.map(item=>{
+    if(productsInCart.length === 0){
+        dom.cart.innerHTML = cartTableTitle + `目前購物車是空的哦～` + cartTableBottom;
+    }else{
+        let cartItems = productsInCart.map(item=>{
         let priceTotal = Number(item.product.price) * Number(item.quantity);
         let cartItem = `<tr class="cart-product">
             <td>
               <div class="cardItem-title">
                 <img src=${item.product.images} alt=${item.product.title} />
-                <p>Antony 雙人床架／雙人加大</p>
+                <p>${item.product.title}</p>
               </div>
             </td>
             <td>NT$${item.product.price}</td>
@@ -131,12 +129,31 @@ function renderCart(productsInCart){
             </td>
           </tr>`;
             return cartItem;
-    }).join("");
-    dom.cart.innerHTML = cartTableTitle + cartItems + cartTableBottom;
-    console.log(dom.cart);
+        }).join("");
+        dom.cart.innerHTML = cartTableTitle + cartItems + cartTableBottom;
+        console.log(dom.cart);
+    }
+    
 
 }
 
+async function addCart(targetId){
+    const prodoctToCart = {
+            data: {
+            productId: targetId,
+            quantity: getQuantity(targetId)
+            }
+        };
+    try {
+        let res = await axios.post(Cart_Api_Url, prodoctToCart);
+        productsInCart = res.data.carts;
+        renderCart(productsInCart);
+    } catch (error) {
+        console.log(error.res.data);
+    }
+    
+    
+}
 dom.productSelect.addEventListener("change", function (e) {
   let categorySelected = e.target.value;
   filterProducts(categorySelected);
