@@ -124,7 +124,7 @@ function renderCart(productsInCart){
     }else{
         let cartItems = productsInCart.map(item=>{
         let priceTotal = Number(item.product.price) * Number(item.quantity);
-        let cartItem = `<tr class="cart-product">
+        let cartItem = `<tr class="cart-product" data-id=${item.id}>
             <td>
               <div class="cardItem-title">
                 <img src=${item.product.images} alt=${item.product.title} />
@@ -144,13 +144,23 @@ function renderCart(productsInCart){
         dom.cart.innerHTML = cartTableTitle + cartItems + cartTableBottom;
         const finalTotalPrice = document.querySelector(".finalTotalPrice");
         finalTotalPrice.textContent = `NT$${cartTotalPrice}`;
+
+        // 刪除所有訂單按鈕
         dom.deleteAllBtn = document.querySelector(".discardAllBtn");
         dom.deleteAllBtn.addEventListener("click",function(e){
             e.preventDefault();
             deleteAllCartItems();
         })
+        // 刪除單一訂單按鈕
+        const deleteBtns = document.querySelectorAll(".discardBtn ");
+        deleteBtns.forEach(btn=>{
+            btn.addEventListener("click",function(e){
+                e.preventDefault();
+                let targetCartId = e.target.closest(".cart-product").dataset.id
+                deleteCartItem(targetCartId);
+            })
+        })
     }
-    
 
 }
 
@@ -177,6 +187,17 @@ async function deleteAllCartItems(){
     try {
         let res = await axios.delete(Cart_Api_Url);
         productsInCart = res.data.carts;
+        renderCart(productsInCart);
+    } catch (error) {
+        console.log(error.res.data);
+    }
+}
+
+async function deleteCartItem(targetCartId){ 
+    try {
+        let res = await axios.delete(Cart_Api_Url + `/${targetCartId}`);
+        productsInCart = res.data.carts;
+        cartTotalPrice = Number(res.data.finalTotal);
         renderCart(productsInCart);
     } catch (error) {
         console.log(error.res.data);
