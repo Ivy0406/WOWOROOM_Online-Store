@@ -4,8 +4,10 @@ let allProducts = [];
 
 const Cart_Api_Url =
   "https://livejs-api.hexschool.io/api/livejs/v1/customer/ivy1215/carts";
+
 let productsInCart = [];
 let cartTotalPrice = 0;
+
 
 // 抓取DOM元素
 const dom = {
@@ -13,8 +15,8 @@ const dom = {
   productSelect: document.querySelector(".productSelect"),
   cart: document.querySelector(".shoppingCart-table"),
   orderInfo: document.querySelector(".orderInfo"),
-  addCardBtns : '' // 等卡片渲染完畢再賦值
-//   
+  addCardBtns : '', // 等卡片渲染完畢再賦值
+  deleteAllBtn: '' // 等購物車渲染完再賦值
 };
 
 const cartTableTitle = `<tr class="table-titile">
@@ -33,9 +35,17 @@ const cartTableBottom = `<tr class="table-bottom">
             <td>
               <p>總金額</p>
             </td>
-            <td>NT$13,980</td>
+            <td class="finalTotalPrice"></td>
           </tr>`;   
-
+const defaultMessageForEmptyCart = `<tr class="table-bottom">
+            <td>
+                <p>目前還沒有喜歡的商品</p>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>`;
 
 // 初始化
 getAllProducts();
@@ -53,9 +63,9 @@ async function getAllProducts() {
 
 async function getProductsInCart() {
   try {
-    let response = await axios.get(Cart_Api_Url);
-    productsInCart = response.data.carts;
-    cartTotalPrice = response.data.finalTotal;
+    let res = await axios.get(Cart_Api_Url);
+    productsInCart = res.data.carts;
+    cartTotalPrice = Number(res.data.finalTotal);
     renderCart(productsInCart);
   } catch (error) {
     console.log(error);
@@ -110,7 +120,7 @@ function getQuantity(targetId) {
 
 function renderCart(productsInCart){
     if(productsInCart.length === 0){
-        dom.cart.innerHTML = cartTableTitle + `目前購物車是空的哦～` + cartTableBottom;
+        dom.cart.innerHTML = cartTableTitle + defaultMessageForEmptyCart + cartTableBottom;
     }else{
         let cartItems = productsInCart.map(item=>{
         let priceTotal = Number(item.product.price) * Number(item.quantity);
@@ -130,8 +140,15 @@ function renderCart(productsInCart){
           </tr>`;
             return cartItem;
         }).join("");
+        
         dom.cart.innerHTML = cartTableTitle + cartItems + cartTableBottom;
-        console.log(dom.cart);
+        const finalTotalPrice = document.querySelector(".finalTotalPrice");
+        finalTotalPrice.textContent = `NT$${cartTotalPrice}`;
+        dom.deleteAllBtn = document.querySelector(".discardAllBtn");
+        dom.deleteAllBtn.addEventListener("click",function(e){
+            e.preventDefault();
+            deleteAllCartItems();
+        })
     }
     
 
@@ -147,6 +164,7 @@ async function addCart(targetId){
     try {
         let res = await axios.post(Cart_Api_Url, prodoctToCart);
         productsInCart = res.data.carts;
+        cartTotalPrice = Number(res.data.finalTotal);
         renderCart(productsInCart);
     } catch (error) {
         console.log(error.res.data);
@@ -154,9 +172,23 @@ async function addCart(targetId){
     
     
 }
+
+async function deleteAllCartItems(){
+    try {
+        let res = await axios.delete(Cart_Api_Url);
+        productsInCart = res.data.carts;
+        renderCart(productsInCart);
+    } catch (error) {
+        console.log(error.res.data);
+    }
+}
+
 dom.productSelect.addEventListener("change", function (e) {
+    e.preventDefault();
   let categorySelected = e.target.value;
   filterProducts(categorySelected);
 });
+
+
 
 
