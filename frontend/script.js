@@ -1,10 +1,10 @@
-const All_Products_Api_Url =
-  "https://livejs-api.hexschool.io/api/livejs/v1/customer/ivy1215/products";
+const All_Products_Api_Url =  "https://livejs-api.hexschool.io/api/livejs/v1/customer/ivy1215/products";
+
+const Cart_Api_Url = "https://livejs-api.hexschool.io/api/livejs/v1/customer/ivy1215/carts";
+
+const Order_Api_Url = "https://livejs-api.hexschool.io/api/livejs/v1/customer/ivy1215/orders";
+
 let allProducts = [];
-
-const Cart_Api_Url =
-  "https://livejs-api.hexschool.io/api/livejs/v1/customer/ivy1215/carts";
-
 let productsInCart = [];
 let cartTotalPrice = 0;
 
@@ -14,10 +14,12 @@ const dom = {
   productsList: document.querySelector(".productWrap"),
   productSelect: document.querySelector(".productSelect"),
   cart: document.querySelector(".shoppingCart-table"),
-  orderInfo: document.querySelector(".orderInfo"),
+  orderInfo: document.querySelector(".orderInfo-form"),
+  submitOrderBtn: document.querySelector(".orderInfo-btn"),
   addCardBtns : '', // 等卡片渲染完畢再賦值
   deleteAllBtn: '' // 等購物車渲染完再賦值
 };
+const inputs = dom.orderInfo.elements;
 
 const cartTableTitle = `<tr class="table-titile">
             <th width="40%">品項</th>
@@ -204,12 +206,78 @@ async function deleteCartItem(targetCartId){
     }
 }
 
+function checkOrderInputs(){
+    let isFinished = true;
+    console.log(inputs);
+    const requiredFields = [
+        'customerName',
+        'customerPhone',
+        'customerEmail',
+        'customerAddress'
+    ]
+    requiredFields.forEach(field=>{
+        let targetInputValue = inputs[field].value.trim();
+        let targetInputMessage = document.querySelector(`#${field} + .orderInfo-message`);
+        const regexEmail = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        let regexEmailMessage = document.querySelector(".email-regax");
+        if(!targetInputValue){
+            console.log(targetInputMessage);
+            isFinished = false;
+            regexEmailMessage.style.display = "none";
+            targetInputMessage.style.display = "block";
+        }else{
+            if(field === 'customerEmail'){
+                if(!regexEmail.test(targetInputValue)){
+                    console.log(regexEmailMessage.style);
+                    targetInputMessage.style.display = "none";
+                    regexEmailMessage.style.display = "block";
+                    onsole.log(regexEmailMessage.style);
+                    isFinished = false;
+                }
+                
+            }else{
+                targetInputMessage.style.display = "none";
+            }
+        }
+    })
+    return isFinished;
+
+}
+
+async function postOrder(){
+    let isValid = checkOrderInputs();
+    let isCartEmpty = productsInCart.length === 0;
+    if(!isValid || isCartEmpty){
+        return;
+    }else{
+        let orderData = {
+            data: {
+                user: {
+                "name": inputs["customerName"].value.trim(),
+                "tel": inputs["customerPhone"].value.trim(),
+                "email": inputs["customerEmail"].value.trim(),
+                "address": inputs["customerAddress"].value.trim(),
+                "payment": inputs["tradeWay"].value
+                }
+            }
+        };
+        const res = await axios.post(Order_Api_Url, orderData);
+        console.log(res);
+    }
+
+}
+
+
+
 dom.productSelect.addEventListener("change", function (e) {
     e.preventDefault();
   let categorySelected = e.target.value;
   filterProducts(categorySelected);
 });
 
-
+dom.submitOrderBtn.addEventListener("click",function(e){
+    e.preventDefault();
+    postOrder();
+});
 
 

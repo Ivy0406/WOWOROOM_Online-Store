@@ -805,6 +805,7 @@ body {
 }
 
 .orderInfo-message {
+  display: none;
   position: absolute;
   white-space: nowrap;
   left: 103%;
