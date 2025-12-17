@@ -870,7 +870,7 @@ body {
 
 @media (max-width: 1110px) {
   .orderPage-table {
-    width: 1100px;
+    width: 100%;
   }
 }
 
@@ -905,3 +905,12 @@ body {
   display: none;
 }
 /*# sourceMappingURL=all.css.map */
+
+
+.orderPage-table .default-message{
+  vertical-align: center;
+  text-align: center;
+  padding: 40px 0;
+  color: #6a33f8;
+  font-size: larger;
+}
