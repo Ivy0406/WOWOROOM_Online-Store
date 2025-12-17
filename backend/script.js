@@ -96,11 +96,8 @@ function editOrderStatus(targetOrder){
         let isPaid = targetStatus === "已付款";
         let nextStatus = !isPaid;
         putOrders(targetId,nextStatus);
-        
-            
     }
         
-    
 }
 
 async function putOrders(id,status) {
