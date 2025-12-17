@@ -64,6 +64,7 @@ function renderOrdersList(orders) {
         } else {
           orderStatus = "已付款";
         }
+        let productsOrdered = order.products.map(product=>`<p>${product.title}</p>`).join("");
         let orderItem = `<tr class="order-item">
                 <td class="order-id">${order.id}</td>
                 <td>
@@ -73,7 +74,7 @@ function renderOrdersList(orders) {
                 <td>${order.user.address}</td>
                 <td>${order.user.email}</td>
                 <td>
-                <p>${order.products[0].title}</p>
+                ${productsOrdered}
                 </td>
                 <td>${new Date(
                   order.createdAt * 1000
@@ -175,6 +176,11 @@ async function deleteTargetOrder(targetOrderId) {
   }
 }
 
+function updateChart(){
+
+}
+
+// 全域監聽綁定
 dom.deleteAllBtn.addEventListener("click", function (e) {
   e.preventDefault();
   let doublecheck = confirm("您確認要刪除所有訂單嗎？");
@@ -184,3 +190,4 @@ dom.deleteAllBtn.addEventListener("click", function (e) {
     deleteAllOrders();
   }
 });
+

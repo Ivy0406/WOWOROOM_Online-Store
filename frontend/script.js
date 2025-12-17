@@ -191,7 +191,7 @@ async function deleteAllCartItems(){
         productsInCart = res.data.carts;
         renderCart(productsInCart);
     } catch (error) {
-        console.log(error.res.data);
+        console.log(error);
     }
 }
 
@@ -261,8 +261,15 @@ async function postOrder(){
                 }
             }
         };
-        const res = await axios.post(Order_Api_Url, orderData);
-        console.log(res);
+        try {
+          await axios.post(Order_Api_Url, orderData);
+          alert("您的訂單已建立成功！");
+          dom.orderInfo.reset();
+          getProductsInCart();
+        } catch (error) {
+          console.log(error);
+        }
+        
     }
 
 }
