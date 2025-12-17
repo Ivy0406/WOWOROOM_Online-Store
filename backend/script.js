@@ -115,3 +115,25 @@ async function putOrders(id,status) {
         console.log(error);
     }
 }
+
+async function deleteAllOrders() {
+    try {
+        let res = await axios.delete(Orders_Api_url,Admin_Token);
+        ordersData = res.data.orders;
+        renderOrdersList(ordersData);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+dom.deleteAllBtn.addEventListener("click",function(e){
+    e.preventDefault();
+    let doublecheck = confirm('您確認要刪除所有訂單嗎？');
+    if(!doublecheck){
+        return
+    }else{
+        deleteAllOrders();
+    }
+})
+
