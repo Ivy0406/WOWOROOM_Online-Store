@@ -46,6 +46,7 @@ async function getOrdersData() {
     ordersData = res.data.orders;
     console.log(ordersData);
     renderOrdersList(ordersData);
+    updateChart(ordersData);
   } catch (error) {
     console.log(error);
   }
@@ -64,7 +65,9 @@ function renderOrdersList(orders) {
         } else {
           orderStatus = "已付款";
         }
-        let productsOrdered = order.products.map(product=>`<p>${product.title}</p>`).join("");
+        let productsOrdered = order.products
+          .map((product) => `<p>${product.title}</p>`)
+          .join("");
         let orderItem = `<tr class="order-item">
                 <td class="order-id">${order.id}</td>
                 <td>
@@ -158,6 +161,7 @@ async function deleteAllOrders() {
     let res = await axios.delete(Orders_Api_url, Admin_Token);
     ordersData = res.data.orders;
     renderOrdersList(ordersData);
+    updateChart(ordersData);
   } catch (error) {
     console.log(error);
   }
@@ -171,13 +175,48 @@ async function deleteTargetOrder(targetOrderId) {
     );
     ordersData = res.data.orders;
     renderOrdersList(ordersData);
+    updateChart(ordersData);
   } catch (error) {
     console.log(error);
   }
 }
 
-function updateChart(){
-
+function updateChart(ordersData) {
+  console.log(ordersData);
+  // 整理圖表資料
+  let productsCount = {};
+  ordersData.reduce((countsObj, order) => {
+    order.products.forEach((product) => {
+      countsObj[product.title] = (countsObj[product.title] || 0) + (product.quantity*product.price);
+    });
+    return countsObj;
+  }, productsCount);
+  console.log(productsCount);
+  const productsCountAry = Object.entries(productsCount).sort((a,b)=> b[1]-a[1]);
+  console.log(productsCountAry);
+  // C3.js
+  let chart = c3.generate({
+    bindto: "#chart", // HTML 元素綁定
+    data: {
+      type: "pie",
+      columns: productsCountAry,
+    },
+    color: {
+        pattern: [
+          "#100729ff",
+          "#301E5F",
+          "#5434A7",
+          "#7E5BEF",
+          "#9D7FEA",
+          "#B4A0FF",
+          "#DACBFF",
+          "#efe6f7ff",
+        ],
+      },
+      size:{
+        height:450
+      }
+  });
 }
 
 // 全域監聽綁定
@@ -190,4 +229,3 @@ dom.deleteAllBtn.addEventListener("click", function (e) {
     deleteAllOrders();
   }
 });
-

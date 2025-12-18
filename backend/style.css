@@ -914,3 +914,7 @@ body {
   color: #6a33f8;
   font-size: larger;
 }
+
+.c3-chart-arcs{
+  fill: white;
+}
