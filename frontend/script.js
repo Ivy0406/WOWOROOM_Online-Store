@@ -16,6 +16,7 @@ const dom = {
   cart: document.querySelector(".shoppingCart-table"),
   orderInfo: document.querySelector(".orderInfo-form"),
   submitOrderBtn: document.querySelector(".orderInfo-btn"),
+  forAdminBtn: document.querySelector(".for-admin-btn"),
   addCardBtns : '', // 等卡片渲染完畢再賦值
   deleteAllBtn: '' // 等購物車渲染完再賦值
 };
@@ -97,6 +98,7 @@ function renderProducts(products) {
     dom.addCardBtns.forEach((btn) => {
     btn.addEventListener("click", function (e) {
         e.preventDefault();
+        alert("已成功加入購物車！")
         let targetId = e.target.closest(".productCard").dataset.id;
         addCart(targetId);
     });
@@ -288,3 +290,12 @@ dom.submitOrderBtn.addEventListener("click",function(e){
 });
 
 
+dom.forAdminBtn.addEventListener("click", function(e){
+  e.preventDefault();
+  let result = prompt("請輸入管理者帳號");
+  if(result === "ivy0406"){
+    window.location.href="./backend/index.html";
+  }else{
+    return;
+  }
+})
