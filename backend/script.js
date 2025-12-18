@@ -16,14 +16,14 @@ const dom = {
 const orderListHead = `
     <thead>
             <tr>
-              <th>訂單編號</th>
-              <th>聯絡人</th>
-              <th>聯絡地址</th>
-              <th>電子郵件</th>
-              <th>訂單品項</th>
-              <th>訂單日期</th>
-              <th>訂單狀態</th>
-              <th>操作</th>
+              <th width="20%">訂單編號</th>
+              <th width="10%">聯絡人</th>
+              <th width="15%">聯絡地址</th>
+              <th width="10%">電子郵件</th>
+              <th width="20%">訂單品項</th>
+              <th width="10%">訂單日期</th>
+              <th width="10%">訂單狀態</th>
+              <th width="5%">操作</th>
             </tr>
           </thead>
 `;
@@ -223,7 +223,7 @@ function updateChart(ordersData,selectedChartType) {
         ],
       },
       size:{
-        height:450
+        height:430
       }
   });
 }
