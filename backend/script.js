@@ -9,6 +9,8 @@ const Admin_Token = {
 const dom = {
   orderList: document.querySelector(".orderPage-table"),
   deleteAllBtn: document.querySelector(".discardAllBtn"),
+  chartTypeSelect: document.querySelector(".chart-type-select"),
+  chartTitle: document.querySelector(".chart-title")
 };
 
 const orderListHead = `
@@ -37,6 +39,7 @@ const defaultMessageForEmptyList = `
 `;
 
 let ordersData = [];
+let selectedChartType = "全品項營收比重";
 
 getOrdersData();
 
@@ -46,7 +49,7 @@ async function getOrdersData() {
     ordersData = res.data.orders;
     console.log(ordersData);
     renderOrdersList(ordersData);
-    updateChart(ordersData);
+    updateChart(ordersData,selectedChartType);
   } catch (error) {
     console.log(error);
   }
@@ -161,7 +164,7 @@ async function deleteAllOrders() {
     let res = await axios.delete(Orders_Api_url, Admin_Token);
     ordersData = res.data.orders;
     renderOrdersList(ordersData);
-    updateChart(ordersData);
+    updateChart(ordersData,selectedChartType);
   } catch (error) {
     console.log(error);
   }
@@ -175,19 +178,25 @@ async function deleteTargetOrder(targetOrderId) {
     );
     ordersData = res.data.orders;
     renderOrdersList(ordersData);
-    updateChart(ordersData);
+    updateChart(ordersData,selectedChartType);
   } catch (error) {
     console.log(error);
   }
 }
 
-function updateChart(ordersData) {
+
+
+function updateChart(ordersData,selectedChartType) {
   console.log(ordersData);
   // 整理圖表資料
   let productsCount = {};
   ordersData.reduce((countsObj, order) => {
     order.products.forEach((product) => {
-      countsObj[product.title] = (countsObj[product.title] || 0) + (product.quantity*product.price);
+      if(selectedChartType === "全品項營收比重"){
+        countsObj[product.title] = (countsObj[product.title] || 0) + (product.quantity*product.price);
+      }else{
+        countsObj[product.category] = (countsObj[product.category] || 0) + (product.quantity*product.price);
+      }
     });
     return countsObj;
   }, productsCount);
@@ -229,3 +238,11 @@ dom.deleteAllBtn.addEventListener("click", function (e) {
     deleteAllOrders();
   }
 });
+
+
+dom.chartTypeSelect.addEventListener("change", function(e){
+  selectedChartType = e.target.value;
+  console.log(selectedChartType);
+  dom.chartTitle.textContent = selectedChartType;
+  updateChart(ordersData,selectedChartType);
+})

@@ -918,3 +918,11 @@ body {
 .c3-chart-arcs{
   fill: white;
 }
+
+.chart-type-select{
+  padding: 5px 15px;
+  color: #000000;
+  border: 1.3px solid #000000;
+  border-radius: 5px;
+  font-size: 1.25rem;
+}
