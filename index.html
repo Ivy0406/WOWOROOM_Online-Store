@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer" />
     <title>🏠WOWOROOM 窩窩家居</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="./frontend/script.js" defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -29,7 +30,7 @@
           <li><a href="#recommendation">好評推薦</a></li>
           <li><a href="#transport">運送方式</a></li>
           <li><a href="#orderInfo">立即預訂</a></li>
-          <li><a href="./backend/index.html">後台管理</a></li>
+          <li><a class="for-admin-btn" href="#">後台管理</a></li>
         </ul>
       </div>
     </nav>
@@ -317,31 +318,7 @@
             <th width="15%">金額</th>
             <th width="15%"></th>
           </tr>
-          <tr class="cart-product">
-            <td>
-              <div class="cardItem-title">
-                <img src="https://i.imgur.com/HvT3zlU.png" alt="" />
-                <p>Antony 雙人床架／雙人加大</p>
-              </div>
-            </td>
-            <td>NT$12,000</td>
-            <td>1</td>
-            <td>NT$12,000</td>
-            <td class="discardBtn">
-              <a href="#" class="material-icons"> clear </a>
-            </td>
-          </tr>
-          <tr class="table-bottom">
-            <td>
-              <a href="#" class="discardAllBtn">刪除所有品項</a>
-            </td>
-            <td></td>
-            <td></td>
-            <td>
-              <p>總金額</p>
-            </td>
-            <td>NT$13,980</td>
-          </tr>
+          
         </table>
       </div>
     </section>

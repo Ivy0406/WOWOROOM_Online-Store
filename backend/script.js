@@ -10,7 +10,8 @@ const dom = {
   orderList: document.querySelector(".orderPage-table"),
   deleteAllBtn: document.querySelector(".discardAllBtn"),
   chartTypeSelect: document.querySelector(".chart-type-select"),
-  chartTitle: document.querySelector(".chart-title")
+  chartTitle: document.querySelector(".chart-title"),
+  chart: document.querySelector("#chart"),
 };
 
 const orderListHead = `
@@ -31,8 +32,8 @@ const orderListHead = `
 const defaultMessageForEmptyList = `
 <tr > 
     <td colspan='8' class="default-message">
-        <span class="material-icons default-icon" >data_info_alert</span>
-        <p>目前暫無新訂單唷 ！</p>
+        <p class="material-icons default-icon">data_info_alert</p>
+        <p>目前暫無新訂單</p>
     </td>
 </tr>
 
@@ -49,7 +50,7 @@ async function getOrdersData() {
     ordersData = res.data.orders;
     console.log(ordersData);
     renderOrdersList(ordersData);
-    updateChart(ordersData,selectedChartType);
+    updateChart(ordersData, selectedChartType);
   } catch (error) {
     console.log(error);
   }
@@ -164,7 +165,7 @@ async function deleteAllOrders() {
     let res = await axios.delete(Orders_Api_url, Admin_Token);
     ordersData = res.data.orders;
     renderOrdersList(ordersData);
-    updateChart(ordersData,selectedChartType);
+    updateChart(ordersData, selectedChartType);
   } catch (error) {
     console.log(error);
   }
@@ -178,39 +179,48 @@ async function deleteTargetOrder(targetOrderId) {
     );
     ordersData = res.data.orders;
     renderOrdersList(ordersData);
-    updateChart(ordersData,selectedChartType);
+    updateChart(ordersData, selectedChartType);
   } catch (error) {
     console.log(error);
   }
 }
 
+function updateChart(ordersData, selectedChartType) {
+  if (ordersData.length === 0) {
+    dom.chart.innerHTML = `
+    <div class="empty-chart">
+    <span class="material-icons default-icon" >data_info_alert</span>
+    <p>目前無資料</p>
+    </div>`;
+  } else {
+    // 整理圖表資料
+    let productsCount = {};
+    ordersData.reduce((countsObj, order) => {
+      order.products.forEach((product) => {
+        if (selectedChartType === "全品項營收比重") {
+          countsObj[product.title] =
+            (countsObj[product.title] || 0) + product.quantity * product.price;
+        } else {
+          countsObj[product.category] =
+            (countsObj[product.category] || 0) +
+            product.quantity * product.price;
+        }
+      });
+      return countsObj;
+    }, productsCount);
 
+    const productsCountAry = Object.entries(productsCount).sort(
+      (a, b) => b[1] - a[1]
+    );
 
-function updateChart(ordersData,selectedChartType) {
-  console.log(ordersData);
-  // 整理圖表資料
-  let productsCount = {};
-  ordersData.reduce((countsObj, order) => {
-    order.products.forEach((product) => {
-      if(selectedChartType === "全品項營收比重"){
-        countsObj[product.title] = (countsObj[product.title] || 0) + (product.quantity*product.price);
-      }else{
-        countsObj[product.category] = (countsObj[product.category] || 0) + (product.quantity*product.price);
-      }
-    });
-    return countsObj;
-  }, productsCount);
-  console.log(productsCount);
-  const productsCountAry = Object.entries(productsCount).sort((a,b)=> b[1]-a[1]);
-  console.log(productsCountAry);
-  // C3.js
-  let chart = c3.generate({
-    bindto: "#chart", // HTML 元素綁定
-    data: {
-      type: "pie",
-      columns: productsCountAry,
-    },
-    color: {
+    // C3 圖表
+    let chart = c3.generate({
+      bindto: "#chart",
+      data: {
+        type: "pie",
+        columns: productsCountAry,
+      },
+      color: {
         pattern: [
           "#100729ff",
           "#301E5F",
@@ -222,10 +232,11 @@ function updateChart(ordersData,selectedChartType) {
           "#efe6f7ff",
         ],
       },
-      size:{
-        height:430
-      }
-  });
+      size: {
+        height: 430,
+      },
+    });
+  }
 }
 
 // 全域監聽綁定
@@ -239,10 +250,9 @@ dom.deleteAllBtn.addEventListener("click", function (e) {
   }
 });
 
-
-dom.chartTypeSelect.addEventListener("change", function(e){
+dom.chartTypeSelect.addEventListener("change", function (e) {
   selectedChartType = e.target.value;
   console.log(selectedChartType);
   dom.chartTitle.textContent = selectedChartType;
-  updateChart(ordersData,selectedChartType);
-})
+  updateChart(ordersData, selectedChartType);
+});

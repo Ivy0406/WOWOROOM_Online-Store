@@ -932,3 +932,12 @@ body {
   display: none;
 }
 /*# sourceMappingURL=all.css.map */
+
+.default-message{
+  vertical-align: middle;
+  text-align: center;
+  padding: 40px 0;
+  color: #301e5f;
+  font-size: larger;
+}
+
