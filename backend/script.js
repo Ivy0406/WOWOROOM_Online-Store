@@ -246,3 +246,4 @@ dom.chartTypeSelect.addEventListener("change", function(e){
   dom.chartTitle.textContent = selectedChartType;
   updateChart(ordersData,selectedChartType);
 })
+
